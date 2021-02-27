@@ -785,13 +785,6 @@ public class InAppBrowser extends CordovaPlugin {
                 return _close;
             }
 			
-			private File createImageFile() throws IOException{
-				@SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-				String imageFileName = "img_"+timeStamp+"_";
-				File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-				return File.createTempFile(imageFileName,".jpg",storageDir);
-			}			
-
             @SuppressLint("NewApi")
             public void run() {
 
@@ -991,6 +984,14 @@ public class InAppBrowser extends CordovaPlugin {
 						cordova.startActivityForResult(InAppBrowser.this, chooserIntent, FILECHOOSER_REQUESTCODE);						
                         return true;
                     }
+					
+					private File createImageFile() throws IOException{
+						@SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+						String imageFileName = "img_"+timeStamp+"_";
+						File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+						return File.createTempFile(imageFileName,".jpg",storageDir);
+					}
+					
                 });
                 currentClient = new InAppBrowserClient(thatWebView, edittext, beforeload);
                 inAppWebView.setWebViewClient(currentClient);
