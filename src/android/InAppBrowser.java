@@ -142,8 +142,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
     private boolean useWideViewPort = true;
-    //private ValueCallback<Uri[]> mUploadCallback;
-	private ValueCallback<Uri> mUploadCallback;
+    private ValueCallback<Uri[]> mUploadCallback;
     private ValueCallback<Uri[]> mUploadCallbackLollipop;	
     private final static int FILECHOOSER_REQUESTCODE = 1;
     private String closeButtonCaption = "";
@@ -934,13 +933,18 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
-                        LOG.d(LOG_TAG, "File Chooser 5.0+");
-                        // If callback exists, finish it.
-                        if(mUploadCallback != null) {
-                            mUploadCallback.onReceiveValue(null);
+                        if(Build.VERSION.SDK_INT >=23 && (cordova.getActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || cordova.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
+                            cordova.getActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
                         }
-                        mUploadCallback = filePathCallback;
-						
+
+                        LOG.d(LOG_TAG, "File Chooser 5.0+");
+
+                        // If callback exists, finish it.
+                        if(mUploadCallbackLollipop != null) {
+                            mUploadCallbackLollipop.onReceiveValue(null);
+                        }
+                        mUploadCallbackLollipop = filePathCallback;
+
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
                         if(takePictureIntent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
@@ -958,13 +962,7 @@ public class InAppBrowser extends CordovaPlugin {
                             }else{
                                 takePictureIntent = null;
                             }
-                        }						
-
-                        // Create File Chooser Intent
-                        Intent content = new Intent(Intent.ACTION_GET_CONTENT);
-                        content.addCategory(Intent.CATEGORY_OPENABLE);
-                        content.setType("*/*");
-						
+                        }
                         // Create File Chooser Intent
                         Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
                         contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -976,24 +974,34 @@ public class InAppBrowser extends CordovaPlugin {
                             intentArray = new Intent[0];
                         }
 
+                        Locale localeInfo = cordova.getActivity().getApplicationContext().getResources()
+                             .getConfiguration().getLocales().get(0);
+
+                        String lang = localeInfo.toLanguageTag();
+
+                        String title;
+
+                        if (lang.startsWith("en"))
+                        {
+                            title = "Choose the source";
+                        } else if (lang.startsWith("es"))
+                        {
+                            title = "Seleccione el origen";
+                        }  else
+                        {
+                            title = "Escolha a origem";
+                        }
+
                         Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
                         chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-                        chooserIntent.putExtra(Intent.EXTRA_TITLE, "Selecione a imagem");
-                        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);						
+                        chooserIntent.putExtra(Intent.EXTRA_TITLE, title);
+                        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
 
                         // Run cordova startActivityForResult
-                        //cordova.startActivityForResult(InAppBrowser.this, Intent.createChooser(content, "Select File"), FILECHOOSER_REQUESTCODE);
-						cordova.startActivityForResult(InAppBrowser.this, chooserIntent, FILECHOOSER_REQUESTCODE);						
+                        cordova.startActivityForResult(InAppBrowser.this, chooserIntent, FILECHOOSER_REQUESTCODE);
+
                         return true;
                     }
-					
-					private File createImageFile() throws IOException{
-						@SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-						String imageFileName = "img_"+timeStamp+"_";
-						File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-						return File.createTempFile(imageFileName,".jpg",storageDir);
-					}
-					
                 });
                 currentClient = new InAppBrowserClient(thatWebView, edittext, beforeload);
                 inAppWebView.setWebViewClient(currentClient);
@@ -1104,6 +1112,13 @@ public class InAppBrowser extends CordovaPlugin {
         this.cordova.getActivity().runOnUiThread(runnable);
         return "";
     }
+	
+    private File createImageFile() throws IOException{
+        @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "img_"+timeStamp+"_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(imageFileName,".jpg",storageDir);
+    }	
 
     /**
      * Create a new plugin success result and send it back to JavaScript
@@ -1139,17 +1154,6 @@ public class InAppBrowser extends CordovaPlugin {
      * @param intent the data from android file chooser
      */
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		/*
-        LOG.d(LOG_TAG, "onActivityResult");
-        // If RequestCode or Callback is Invalid
-        if(requestCode != FILECHOOSER_REQUESTCODE || mUploadCallback == null) {
-            super.onActivityResult(requestCode, resultCode, intent);
-            return;
-        }
-        mUploadCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent));
-        mUploadCallback = null;
-		*/
-		
         // For Android >= 5.0
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
@@ -1192,7 +1196,7 @@ public class InAppBrowser extends CordovaPlugin {
 
             mUploadCallback.onReceiveValue(result);
             mUploadCallback = null;
-        }		
+        }
     }
 
     /**
