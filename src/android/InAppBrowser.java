@@ -143,6 +143,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean shouldPauseInAppBrowser = false;
     private boolean useWideViewPort = true;
     private ValueCallback<Uri[]> mUploadCallback;
+    private ValueCallback<Uri[]> mUploadCallbackLollipop;	
     private final static int FILECHOOSER_REQUESTCODE = 1;
     private String closeButtonCaption = "";
     private String closeButtonColor = "";
