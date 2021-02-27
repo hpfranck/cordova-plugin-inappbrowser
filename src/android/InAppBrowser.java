@@ -940,12 +940,12 @@ public class InAppBrowser extends CordovaPlugin {
                         mUploadCallback = filePathCallback;
 						
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
+/*
                         if(takePictureIntent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
 
                             File photoFile = null;
                             try{
-                                //photoFile = createImageFile();
+                                photoFile = createImageFile();
                                 takePictureIntent.putExtra("PhotoPath", mCM);
                             }catch(IOException ex){
                                 Log.e(LOG_TAG, "Image file creation failed", ex);
@@ -957,7 +957,7 @@ public class InAppBrowser extends CordovaPlugin {
                                 takePictureIntent = null;
                             }
                         }						
-
+*/
                         // Create File Chooser Intent
                         Intent content = new Intent(Intent.ACTION_GET_CONTENT);
                         content.addCategory(Intent.CATEGORY_OPENABLE);
