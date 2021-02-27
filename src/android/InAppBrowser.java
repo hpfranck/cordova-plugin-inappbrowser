@@ -85,6 +85,7 @@ import java.util.StringTokenizer;
 
 
 import android.app.Activity;
+import android.Manifest;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
