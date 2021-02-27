@@ -1188,7 +1188,7 @@ public class InAppBrowser extends CordovaPlugin {
                     }
                 }
             }
-            mUploadCallbackLollipop .onReceiveValue(results);
+            mUploadCallbackLollipop.onReceiveValue(results);
             mUploadCallbackLollipop = null;
         }
         // For Android < 5.0
@@ -1203,7 +1203,7 @@ public class InAppBrowser extends CordovaPlugin {
             if (null == mUploadCallback) return;
             Uri result = intent == null || resultCode != cordova.getActivity().RESULT_OK ? null : intent.getData();
 
-            mUploadCallback.onReceiveValue(result);
+            //mUploadCallback.onReceiveValue(result);
             mUploadCallback = null;
         }
     }
