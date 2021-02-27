@@ -169,6 +169,9 @@ public class InAppBrowser extends CordovaPlugin {
     private InAppBrowserClient currentClient;
 	
 	private String mCM;
+	
+    private String mCapturedPhoto;
+    private final static int PERM_REQUEST_CAMERA_FOR_FILE = 3;	
 
     /**
      * Executes the request and returns PluginResult.
@@ -291,6 +294,37 @@ public class InAppBrowser extends CordovaPlugin {
                     } else {
                         ((InAppBrowserClient)inAppWebView.getWebViewClient()).waitForBeforeload = false;
                     }
+					
+					inAppWebView.getSettings().setJavaScriptEnabled(true);
+					inAppWebView.getSettings().setAllowFileAccessFromFileURLs(true);
+					inAppWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
+					inAppWebView.settings.mediaPlaybackRequiresUserGesture = false
+
+
+					inAppWebView.setWebViewClient(new WebViewClient());
+					inAppWebView.setWebChromeClient(new WebChromeClient() {
+						// Grant permissions for cam
+						@Override
+						public void onPermissionRequest(final PermissionRequest request) {
+							Log.d(TAG, "onPermissionRequest");
+							MainActivity.this.runOnUiThread(new Runnable() {
+								@TargetApi(Build.VERSION_CODES.M)
+								@Override
+								public void run() {
+									Log.d(TAG, request.getOrigin().toString());
+									if(request.getOrigin().toString().equals("file:///")) {
+										Log.d(TAG, "GRANTED");
+										request.grant(request.getResources());
+									} else {
+										Log.d(TAG, "DENIED");
+										request.deny();
+									}
+								}
+							});
+						}
+
+
+					});					
                     inAppWebView.loadUrl(url);
                 }
             });
@@ -942,98 +976,93 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
-                        return false;
 						
-						if(Build.VERSION.SDK_INT >=23 && (cordova.getActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || cordova.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
-                            cordova.getActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
-                        }
-
                         LOG.d(LOG_TAG, "File Chooser 5.0+");
-
                         // If callback exists, finish it.
-                        if(mUploadCallbackLollipop != null) {
+                        if (mUploadCallbackLollipop != null) {
                             mUploadCallbackLollipop.onReceiveValue(null);
                         }
                         mUploadCallbackLollipop = filePathCallback;
 
-                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                        if(takePictureIntent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
-
-                            File photoFile = null;
-                            try{
-                                photoFile = createImageFile();
-                                takePictureIntent.putExtra("PhotoPath", mCM);
-                            }catch(IOException ex){
-                                Log.e(LOG_TAG, "Image file creation failed", ex);
-                            }
-                            if(photoFile != null){
-                                mCM = "file:" + photoFile.getAbsolutePath();
-                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                            }else{
-                                takePictureIntent = null;
-                            }
-                        }
-                        // Create File Chooser Intent
-                        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                        contentSelectionIntent.setType("*/*");
-                        Intent[] intentArray;
-                        if(takePictureIntent != null){
-                            intentArray = new Intent[]{takePictureIntent};
-                        }else{
-                            intentArray = new Intent[0];
+                        // #Update to always open camera app
+                        if (checkPermissionForCamera()) {
+                            return true;
                         }
 
-                        Locale localeInfo = cordova.getActivity().getApplicationContext().getResources()
-                             .getConfiguration().getLocales().get(0);
-
-                        String lang = localeInfo.toLanguageTag();
-
-                        String title;
-
-                        if (lang.startsWith("en"))
-                        {
-                            title = "Choose the source";
-                        } else if (lang.startsWith("es"))
-                        {
-                            title = "Seleccione el origen";
-                        }  else
-                        {
-                            title = "Escolha a origem";
-                        }
-
-                        //Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-						Intent chooserIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-                        chooserIntent.putExtra(Intent.EXTRA_TITLE, title);
-                        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-
-                        // Run cordova startActivityForResult
-                        cordova.startActivityForResult(InAppBrowser.this, chooserIntent, FILECHOOSER_REQUESTCODE);
-
+                        startCameraActivityForAndroidFivePlus();
                         return true;
                     }
+
+					public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults)
+							throws JSONException {
+
+						for (int r : grantResults) {
+							if (r == PackageManager.PERMISSION_DENIED) {
+								Toast.makeText(cordova.getActivity(), "Autorisation pour ouvrir la caméra refusé", Toast.LENGTH_LONG)
+										.show();
+								mUploadCallbackLollipop.onReceiveValue(null);
+								mUploadCallbackLollipop = null;
+								return;
+							}
+						}
+
+						if (requestCode == PERM_REQUEST_CAMERA_FOR_FILE) {
+							startCameraActivityForAndroidFivePlus();
+						}
+					}
+
+					private File createImageFile() throws IOException {
+						@SuppressLint("SimpleDateFormat")
+						String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+						String imageFileName = "img_" + timeStamp + "_";
+						File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+						return File.createTempFile(imageFileName, ".jpg", storageDir);
+					}
+
+					private void startCameraActivityForAndroidFivePlus() {
+						Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+						File photoFile = null;
+						try {
+							photoFile = createImageFile();
+							takePictureIntent.putExtra("PhotoPath", mCapturedPhoto);
+						} catch (IOException ex) {
+							LOG.e(LOG_TAG, "Image file creation failed", ex);
+						}
+						if (photoFile != null) {
+							mCapturedPhoto = "file:" + photoFile.getAbsolutePath();
+							takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+						} else {
+							takePictureIntent = null;
+						}
+
+						// Fix FileUriExposedException exposed beyond app through ClipData.Item.getUri()
+						StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+						StrictMode.setVmPolicy(builder.build());
+
+						// Run cordova startActivityForResult
+						cordova.startActivityForResult(InAppBrowser.this, takePictureIntent, FILECHOOSER_REQUESTCODE_LOLLIPOP);
+					}
+
+					private boolean checkPermissionForCamera() {
+						if (Build.VERSION.SDK_INT >= 23) {
+							List<String> permToAsk = new ArrayList<String>();
+							if (cordova.getActivity().checkSelfPermission(
+									Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+								permToAsk.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+							}
+							if (cordova.getActivity()
+									.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+								permToAsk.add(Manifest.permission.CAMERA);
+							}
+							if (permToAsk.size() > 0) {
+								cordova.requestPermissions(InAppBrowser.this, PERM_REQUEST_CAMERA_FOR_FILE,
+										permToAsk.toArray(new String[permToAsk.size()]));
+								return true;
+							}
+						}
+						return false;
+					}
 					
-                    // For Android 4.1+
-                    public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture)
-                    {
-                        LOG.d(LOG_TAG, "File Chooser 4.1+");
-                        // Call file chooser for Android 3.0+
-                        openFileChooser(uploadMsg, acceptType);
-                    }
-
-                    // For Android 3.0+
-                    public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType)
-                    {
-                        LOG.d(LOG_TAG, "File Chooser 3.0+");
-                        //mUploadCallback = uploadMsg;
-                        Intent content = new Intent(Intent.ACTION_GET_CONTENT);
-                        content.addCategory(Intent.CATEGORY_OPENABLE);
-
-                        // run startActivityForResult
-                        cordova.startActivityForResult(InAppBrowser.this, Intent.createChooser(content, "Select File"), FILECHOOSER_REQUESTCODE);
-                    }					
                 });
                 currentClient = new InAppBrowserClient(thatWebView, edittext, beforeload);
                 inAppWebView.setWebViewClient(currentClient);
@@ -1145,13 +1174,6 @@ public class InAppBrowser extends CordovaPlugin {
         return "";
     }
 	
-    private File createImageFile() throws IOException{
-        @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "img_"+timeStamp+"_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(imageFileName,".jpg",storageDir);
-    }	
-
     /**
      * Create a new plugin success result and send it back to JavaScript
      *
