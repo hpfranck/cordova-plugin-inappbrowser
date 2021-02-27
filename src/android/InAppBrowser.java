@@ -1024,7 +1024,7 @@ public class InAppBrowser extends CordovaPlugin {
                     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType)
                     {
                         LOG.d(LOG_TAG, "File Chooser 3.0+");
-                        mUploadCallback = uploadMsg;
+                        //mUploadCallback = uploadMsg;
                         Intent content = new Intent(Intent.ACTION_GET_CONTENT);
                         content.addCategory(Intent.CATEGORY_OPENABLE);
 
