@@ -1001,7 +1001,8 @@ public class InAppBrowser extends CordovaPlugin {
                             title = "Escolha a origem";
                         }
 
-                        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+                        //Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+						Intent chooserIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
                         chooserIntent.putExtra(Intent.EXTRA_TITLE, title);
                         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
