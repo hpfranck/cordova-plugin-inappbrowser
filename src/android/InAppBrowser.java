@@ -946,7 +946,7 @@ public class InAppBrowser extends CordovaPlugin {
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
 
-
+						return true;
                     }
                 });
                 currentClient = new InAppBrowserClient(thatWebView, edittext, beforeload);
