@@ -20,6 +20,8 @@ package org.apache.cordova.inappbrowser;
 
 import android.Manifest;
 import android.app.Activity;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
