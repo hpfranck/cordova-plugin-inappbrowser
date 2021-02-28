@@ -181,8 +181,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @return A PluginResult object with a status and message.
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
-        if (action.equals("XXopen")) {
-
+        if (action.equals("open")) {
             this.callbackContext = callbackContext;
             final String url = args.getString(0);
             String t = args.optString(1);
@@ -946,7 +945,8 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
-                        Toast.makeText(cordova.getActivity(), "onShowFileChooser - 1", Toast.LENGTH_SHORT).show();
+                        return false;
+						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 1", Toast.LENGTH_SHORT).show();
 
 						if(Build.VERSION.SDK_INT >=23 && (cordova.getActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || cordova.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
                             Toast.makeText(cordova.getActivity(), "onShowFileChooser - 2", Toast.LENGTH_SHORT).show();
