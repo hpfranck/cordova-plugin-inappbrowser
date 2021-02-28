@@ -332,6 +332,7 @@ public class InAppBrowser extends CordovaPlugin {
             injectDeferredObject(args.getString(0), jsWrapper);
         }
         else if (action.equals("show")) {
+			Toast.makeText(cordova.getActivity(), "show - 1", Toast.LENGTH_SHORT).show();
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
