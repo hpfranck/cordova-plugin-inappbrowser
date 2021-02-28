@@ -239,7 +239,7 @@ public class InAppBrowser extends CordovaPlugin {
                         // load in webview
                         if (Boolean.TRUE.equals(shouldAllowNavigation)) {
                             LOG.d(LOG_TAG, "loading in webview");
-                            webView.loadUrl(url);
+                            //webView.loadUrl(url);
                         }
                         //Load the dialer
                         else if (url.startsWith(WebView.SCHEME_TEL))
@@ -325,7 +325,7 @@ public class InAppBrowser extends CordovaPlugin {
 
 
 					});					
-                    inAppWebView.loadUrl(url);
+                    inApp//webView.loadUrl(url);
                 }
             });
         }
@@ -654,7 +654,7 @@ public class InAppBrowser extends CordovaPlugin {
         if (!url.startsWith("http") && !url.startsWith("file:")) {
             this.inAppWebView.loadUrl("http://" + url);
         } else {
-            this.inAppWebView.loadUrl(url);
+            this.inApp//webView.loadUrl(url);
         }
         this.inAppWebView.requestFocus();
     }
@@ -1119,7 +1119,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // Enable Thirdparty Cookies
                 CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
 
-                inAppWebView.loadUrl(url);
+                inApp//webView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
