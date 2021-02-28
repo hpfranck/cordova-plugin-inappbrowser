@@ -148,7 +148,6 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearAllCache = false;
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
-    private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
     private boolean useWideViewPort = true;
     private ValueCallback<Uri[]> mUploadCallback;
@@ -298,8 +297,6 @@ public class InAppBrowser extends CordovaPlugin {
 					inAppWebView.getSettings().setJavaScriptEnabled(true);
 					inAppWebView.getSettings().setAllowFileAccessFromFileURLs(true);
 					inAppWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
-					inAppWebView.settings.mediaPlaybackRequiresUserGesture = false;
-
 
 					inAppWebView.setWebViewClient(new WebViewClient());
 					inAppWebView.setWebChromeClient(new WebChromeClient() {
