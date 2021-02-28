@@ -298,7 +298,7 @@ public class InAppBrowser extends CordovaPlugin {
 					inAppWebView.getSettings().setJavaScriptEnabled(true);
 					inAppWebView.getSettings().setAllowFileAccessFromFileURLs(true);
 					inAppWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
-					inAppWebView.settings.mediaPlaybackRequiresUserGesture = false
+					inAppWebView.settings.mediaPlaybackRequiresUserGesture = false;
 
 
 					inAppWebView.setWebViewClient(new WebViewClient());
@@ -325,7 +325,7 @@ public class InAppBrowser extends CordovaPlugin {
 
 
 					});					
-                    inApp//webView.loadUrl(url);
+                    inAppwebView.loadUrl(url);
                 }
             });
         }
@@ -654,7 +654,7 @@ public class InAppBrowser extends CordovaPlugin {
         if (!url.startsWith("http") && !url.startsWith("file:")) {
             this.inAppWebView.loadUrl("http://" + url);
         } else {
-            this.inApp//webView.loadUrl(url);
+            this.inAppwebView.loadUrl(url);
         }
         this.inAppWebView.requestFocus();
     }
@@ -1119,7 +1119,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // Enable Thirdparty Cookies
                 CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
 
-                inApp//webView.loadUrl(url);
+                inAppwebView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
