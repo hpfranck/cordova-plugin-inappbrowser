@@ -18,6 +18,8 @@
 */
 package org.apache.cordova.inappbrowser;
 
+import android.Manifest;
+import android.app.Activity;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
