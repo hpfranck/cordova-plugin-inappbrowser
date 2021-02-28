@@ -945,81 +945,8 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
-                        return false;
-						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 1", Toast.LENGTH_SHORT).show();
 
-						if(Build.VERSION.SDK_INT >=23 && (cordova.getActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || cordova.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
-                            Toast.makeText(cordova.getActivity(), "onShowFileChooser - 2", Toast.LENGTH_SHORT).show();
-							cordova.getActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
-                        }
 
-                        LOG.d(LOG_TAG, "File Chooser 5.0+");
-
-                        // If callback exists, finish it.
-                        if(mUploadCallbackLollipop != null) {
-                            mUploadCallbackLollipop.onReceiveValue(null);
-                        }
-                        mUploadCallbackLollipop = filePathCallback;
-
-						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 3", Toast.LENGTH_SHORT).show();
-                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                        if(takePictureIntent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
-
-                            File photoFile = null;
-                            try{
-                                photoFile = createImageFile();
-                                takePictureIntent.putExtra("PhotoPath", mCM);
-                            }catch(IOException ex){
-                                LOG.e(LOG_TAG, "Image file creation failed", ex);
-                            }
-                            if(photoFile != null){
-                                mCM = "file:" + photoFile.getAbsolutePath();
-                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                            }else{
-                                takePictureIntent = null;
-                            }
-                        }
-						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 4", Toast.LENGTH_SHORT).show();						
-                        // Create File Chooser Intent
-                        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                        contentSelectionIntent.setType("*/*");
-                        Intent[] intentArray;
-                        if(takePictureIntent != null){
-                            intentArray = new Intent[]{takePictureIntent};
-                        }else{
-                            intentArray = new Intent[0];
-                        }
-
-						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 5", Toast.LENGTH_SHORT).show();
-                        Locale localeInfo = cordova.getActivity().getApplicationContext().getResources()
-                             .getConfiguration().getLocales().get(0);
-
-                        String lang = localeInfo.toLanguageTag();
-
-                        String title;
-
-                        if (lang.startsWith("en"))
-                        {
-                            title = "Choose the source";
-                        } else if (lang.startsWith("es"))
-                        {
-                            title = "Seleccione el origen";
-                        }  else
-                        {
-                            title = "Escolha a origem";
-                        }
-						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 6", Toast.LENGTH_SHORT).show();
-                        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-                        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-                        chooserIntent.putExtra(Intent.EXTRA_TITLE, title);
-                        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-
-                        // Run cordova startActivityForResult
-                        cordova.startActivityForResult(InAppBrowser.this, chooserIntent, FILECHOOSER_REQUESTCODE);
-
-                        return true;
                     }
                 });
                 currentClient = new InAppBrowserClient(thatWebView, edittext, beforeload);
