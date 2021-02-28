@@ -943,8 +943,11 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
-                        if(Build.VERSION.SDK_INT >=23 && (cordova.getActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || cordova.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
-                            cordova.getActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
+                        Toast.makeText(cordova.getActivity(), "onShowFileChooser - 1", Toast.LENGTH_SHORT).show();
+
+						if(Build.VERSION.SDK_INT >=23 && (cordova.getActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || cordova.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
+                            Toast.makeText(cordova.getActivity(), "onShowFileChooser - 2", Toast.LENGTH_SHORT).show();
+							cordova.getActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 1);
                         }
 
                         LOG.d(LOG_TAG, "File Chooser 5.0+");
@@ -955,6 +958,7 @@ public class InAppBrowser extends CordovaPlugin {
                         }
                         mUploadCallbackLollipop = filePathCallback;
 
+						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 3", Toast.LENGTH_SHORT).show();
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
                         if(takePictureIntent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
@@ -973,6 +977,7 @@ public class InAppBrowser extends CordovaPlugin {
                                 takePictureIntent = null;
                             }
                         }
+						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 4", Toast.LENGTH_SHORT).show();						
                         // Create File Chooser Intent
                         Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
                         contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -984,6 +989,7 @@ public class InAppBrowser extends CordovaPlugin {
                             intentArray = new Intent[0];
                         }
 
+						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 5", Toast.LENGTH_SHORT).show();
                         Locale localeInfo = cordova.getActivity().getApplicationContext().getResources()
                              .getConfiguration().getLocales().get(0);
 
@@ -1001,7 +1007,7 @@ public class InAppBrowser extends CordovaPlugin {
                         {
                             title = "Escolha a origem";
                         }
-
+						Toast.makeText(cordova.getActivity(), "onShowFileChooser - 6", Toast.LENGTH_SHORT).show();
                         Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
                         chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
                         chooserIntent.putExtra(Intent.EXTRA_TITLE, title);
