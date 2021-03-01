@@ -1591,5 +1591,25 @@ public class InAppBrowser extends CordovaPlugin {
             // By default handle 401 like we'd normally do!
             super.onReceivedHttpAuthRequest(view, handler, host, realm);
         }
+		
+	   @Override
+	   public boolean handleMessage(Message msg) {
+		  if (msg.what == CLICK_ON_URL) {
+			 handler.removeMessages(CLICK_ON_WEBVIEW);
+			 return true;
+		  }
+		  if (msg.what == CLICK_ON_WEBVIEW) {
+			 Toast.makeText(this, "WebView clicked", Toast.LENGTH_SHORT).show();
+			 return true;
+		  }
+		  return false;
+	   }
+	   @Override
+	   public boolean onTouch(View v, MotionEvent event) {
+		  if (v.getId() == R.id.webView && event.getAction() == MotionEvent.ACTION_DOWN) {
+			 handler.sendEmptyMessageDelayed(CLICK_ON_WEBVIEW, 500);
+		  }
+		  return false;
+	   }		
     }
 }
