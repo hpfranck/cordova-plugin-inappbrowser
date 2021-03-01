@@ -1258,6 +1258,7 @@ public class InAppBrowser extends CordovaPlugin {
         @SuppressWarnings("deprecation")
         @Override
         public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+			Toast.makeText(cordova.getActivity(), "shouldOverrideUrlLoading - 1", Toast.LENGTH_SHORT).show();			
             return shouldOverrideUrlLoading(url, null);
         }
 
@@ -1592,10 +1593,5 @@ public class InAppBrowser extends CordovaPlugin {
             super.onReceivedHttpAuthRequest(view, handler, host, realm);
         }
 		
-		@Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			Toast.makeText(cordova.getActivity(), "shouldOverrideUrlLoading - 1", Toast.LENGTH_SHORT).show();			
-            return true;
-        }		
     }
 }
