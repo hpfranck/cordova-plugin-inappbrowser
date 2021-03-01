@@ -177,7 +177,7 @@ public class InAppBrowser extends CordovaPlugin {
 	
 	private static final int CLICK_ON_WEBVIEW = 1;
     private static final int CLICK_ON_URL = 2;
-    private final Handler handler = new Handler(this);
+    private final Handler handler = new Handler(InAppBrowser);
 
 
     /**
@@ -1607,7 +1607,7 @@ public class InAppBrowser extends CordovaPlugin {
 			 return true;
 		  }
 		  if (msg.what == CLICK_ON_WEBVIEW) {
-			 Toast.makeText(this, "WebView clicked", Toast.LENGTH_SHORT).show();
+			 Toast.makeText(cordova.getActivity(, "WebView clicked", Toast.LENGTH_SHORT).show();
 			 return true;
 		  }
 		  return false;
