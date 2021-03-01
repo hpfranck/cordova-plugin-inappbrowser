@@ -101,10 +101,6 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Locale;
 
-import android.os.Handler;
-import android.os.Message;
-import android.view.MotionEvent;
-
 
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
@@ -175,10 +171,6 @@ public class InAppBrowser extends CordovaPlugin {
     private final static int FILECHOOSER_REQUESTCODE_LOLLIPOP = 2;		
     private String mCM;
 	
-	private static final int CLICK_ON_WEBVIEW = 1;
-    private static final int CLICK_ON_URL = 2;
-    private final Handler handler = new Handler(InAppBrowser);
-
 
     /**
      * Executes the request and returns PluginResult.
