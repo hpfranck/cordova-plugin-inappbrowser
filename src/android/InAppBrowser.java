@@ -1178,6 +1178,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @param intent the data from android file chooser
      */
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		Toast.makeText(cordova.getActivity(), "onActivityResult - 1", Toast.LENGTH_SHORT).show();			
         // For Android >= 5.0
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
