@@ -1274,6 +1274,7 @@ public class InAppBrowser extends CordovaPlugin {
         @TargetApi(Build.VERSION_CODES.N)
         @Override
         public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
+			Toast.makeText(cordova.getActivity(), "shouldOverrideUrlLoading-WebResourceRequest - 1", Toast.LENGTH_SHORT).show();			
             return shouldOverrideUrlLoading(request.getUrl().toString(), request.getMethod());
         }
 
