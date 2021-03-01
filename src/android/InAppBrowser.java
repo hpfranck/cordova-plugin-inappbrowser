@@ -1600,24 +1600,10 @@ public class InAppBrowser extends CordovaPlugin {
             super.onReceivedHttpAuthRequest(view, handler, host, realm);
         }
 		
-	   @Override
-	   public boolean handleMessage(Message msg) {
-		  if (msg.what == CLICK_ON_URL) {
-			 handler.removeMessages(CLICK_ON_WEBVIEW);
-			 return true;
-		  }
-		  if (msg.what == CLICK_ON_WEBVIEW) {
-			 Toast.makeText(cordova.getActivity(, "WebView clicked", Toast.LENGTH_SHORT).show();
-			 return true;
-		  }
-		  return false;
-	   }
-	   @Override
-	   public boolean onTouch(View v, MotionEvent event) {
-		  if (v.getId() == R.id.webView && event.getAction() == MotionEvent.ACTION_DOWN) {
-			 handler.sendEmptyMessageDelayed(CLICK_ON_WEBVIEW, 500);
-		  }
-		  return false;
-	   }		
+		@Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+			Toast.makeText(cordova.getActivity(), "shouldOverrideUrlLoading - 1", Toast.LENGTH_SHORT).show();			
+            return true;
+        }		
     }
 }
